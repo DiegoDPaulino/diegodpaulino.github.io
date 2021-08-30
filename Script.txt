@@ -1,30 +1,169 @@
-<!--
-	Modified by @diegodpaulino
-	html5up.net | @ajlkn
-	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
--->
+###Libraries I used###
+
+library(tidyverse)
+library(readr)
+library(janitor)
+library(here)
+library(plyr)
+library(dir)
+library(lubridate)
+library(tidyr)
+library(readtext)
+
+q1_2020 <- data.frame(read_csv(file.path( "~/Documents/cyclistic_data/divvy_trips/Divvy_Trips_2020_Q1/", "Divvy_Trips_2020_Q1.csv"))) %>%
+  select(everything())
+
+##establish naming convention throughout all datasets##
+
+q1_2020 <- as.data.frame(q1_2020) 
+
+q1_2020 <- q1_2020 %>%
+  select(-c(end_lng,
+            start_lat,
+            start_lng,
+            end_lat))
+
+q4_2019 <- read_csv(file.path( "~/Documents/cyclistic_data/divvy_trips/Divvy_Trips_2019_Q4/", "Divvy_Trips_2019_Q4.csv")) %>%
+  select(everything())
+
+q4_2019<- as.data.frame(q4_2019)
+  
+names(q4_2019)[names(q4_2019) == "trip_id"] <- "ride_id"
+names(q4_2019)[names(q4_2019) == "bikeid" ] <- "rideable_type"
+names(q4_2019)[names(q4_2019) == "start_time" ] <- "started_at"
+names(q4_2019)[names(q4_2019) == "end_time" ] <- "ended_at"
+names(q4_2019)[names(q4_2019) == "from_station_name" ] <- "start_station_name"
+names(q4_2019)[names(q4_2019) == "from_station_id" ] <- "start_station_id"
+names(q4_2019)[names(q4_2019) == "to_station_name" ] <- "end_station_name"
+names(q4_2019)[names(q4_2019) == "to_station_id" ] <- "end_station_id"
+names(q4_2019)[names(q4_2019) == "usertype" ] <- "member_casual"
 
 
-Modified version of boiler-template from html5.net
-The purpose of this site is to host my personal and professional projects for easy access.
+##Convert these columns to character so that they can stack correctly###
 
 
+q4_2019 <-  mutate(q4_2019, ride_id = as.character(ride_id)
+                   ,rideable_type = as.character(rideable_type)) 
+
+##drop columns that are not part of q1_2020##
+q4_2019 <- q4_2019 %>%
+  select(-c(birthyear,
+            gender,
+            tripduration))
+
+q3_2019<- read_csv(file.path("~/Documents/cyclistic_data/divvy_trips/Divvy_Trips_2019_Q3/", "Divvy_Trips_2019_Q3.csv")) %>%
+  select(everything())
+
+q3_2019<- as.data.frame(q3_2019) 
+  
+names(q3_2019)[names(q3_2019) == "trip_id"] <- "ride_id"
+names(q3_2019)[names(q3_2019) == "bikeid" ] <- "rideable_type"
+names(q3_2019)[names(q3_2019) == "start_time" ] <- "started_at"
+names(q3_2019)[names(q3_2019) == "end_time" ] <- "ended_at"
+names(q3_2019)[names(q3_2019) == "from_station_name" ] <- "start_station_name"
+names(q3_2019)[names(q3_2019) == "from_station_id" ] <- "start_station_id"
+names(q3_2019)[names(q3_2019) == "to_station_name" ] <- "end_station_name"
+names(q3_2019)[names(q3_2019) == "to_station_id" ] <- "end_station_id"
+names(q3_2019)[names(q3_2019) == "usertype" ] <- "member_casual"
+
+##Convert these colums to character so that they can stack correctly###
+
+q3_2019 <-  mutate(q3_2019, ride_id = as.character(ride_id)
+                   ,rideable_type = as.character(rideable_type)) 
+
+##drop columns that are not part of q1_2020##
+q3_2019 <- q3_2019 %>%
+  select(-c(tripduration,
+            birthyear,
+            gender))
+
+q2_2019 <- read.delim(file.path("~/Documents/cyclistic_data/divvy_trips/Divvy_Trips_2019_Q2/", "Divvy_Trips_2019_Q2.txt"), header = TRUE, sep = ",") %>%
+  select(everything())
+
+q2_2019 <- as.data.frame(q2_2019) 
+
+names(q2_2019)[names(q2_2019) ==  "X01...Rental.Details.Rental.ID" ] <- "ride_id"
+names(q2_2019)[names(q2_2019) ==  "X01...Rental.Details.Bike.ID" ] <- "rideable_type"
+names(q2_2019)[names(q2_2019) ==  "X01...Rental.Details.Local.Start.Time"] <- "started_at"
+names(q2_2019)[names(q2_2019) ==  "X01...Rental.Details.Local.End.Time"] <- "ended_at"
+names(q2_2019)[names(q2_2019) ==  "X03...Rental.Start.Station.Name"] <- "start_station_name"
+names(q2_2019)[names(q2_2019) ==  "X03...Rental.Start.Station.ID"] <- "start_station_id"
+names(q2_2019)[names(q2_2019) ==  "X02...Rental.End.Station.Name"] <- "end_station_name"
+names(q2_2019)[names(q2_2019) ==  "X02...Rental.End.Station.ID"] <- "end_station_id"
+names(q2_2019)[names(q2_2019) ==  "User.Type"] <- "member_casual"
+
+##convert these colums to character so that they can stack correctly###
+
+q2_2019 <-  mutate(q2_2019, ride_id = as.character(ride_id)
+                   ,rideable_type = as.character(rideable_type)) 
+
+##drop columns that are not part of q1_2020##
+
+q2_2019 <- q2_2019 %>%
+  select(-c(X01...Rental.Details.Duration.In.Seconds.Uncapped,
+            Member.Gender,
+            X05...Member.Details.Member.Birthday.Year))
+
+##Check the dataframes for incongruencies###
+
+str(q1_2020)
+str(q4_2019)
+str(q3_2019)
+str(q2_2019)
+
+##Merge dataframes##
+
+merge_data1 <- rbind(q1_2020, q4_2019, q3_2019, q2_2019, fill = NULL)
+
+str(merge_data1)
+summary(merge_data1)
+
+#####set merge_data1$member_casual from 4 categories to 2####
+
+merge_data1$member_casual<- as.character(merge_data1$member_casual)
 
 
+merge_data1$member_casual[merge_data1$member_casual == "member"] <-"Member"
+merge_data1$member_casual[merge_data1$member_casual == "Customer"] <-"Member"
+merge_data1$member_casual[merge_data1$member_casual == "casual"] <-"Casual"
+merge_data1$member_casual[merge_data1$member_casual == "Subscriber"] <-"Casual"
 
 
-Credits:
+##check for na, empty, and null cells##
 
-    Modifications made by
-        @diegodpaulino
+sum(is.na(merge_data1))
+sum(is_empty(merge_data1))
+sum(is.null(merge_data1))
 
-	Demo Images:
-		Unsplash (unsplash.com)
+##[1] 2
+## sum(is_empty(merge_data1))
+##[1] 0
+##> sum(is.null(merge_data1))
+##[1] 0
+##> View(merge_data1 = NULL)
 
-	Icons:
-		Font Awesome (fontawesome.io)
+###create day, month, and year columns###
 
-	Other:
-		jQuery (jquery.com)
-		Scrollex (github.com/ajlkn/jquery.scrollex)
-		Responsive Tools (github.com/ajlkn/responsive-tools)
+merge_data1 <- merge_data1%>%
+  add_column(day =weekdays(merge_data1$started_at),
+             month = month(merge_data1$started_at),
+            year = year(merge_data1$started_at),
+            ride_duration = difftime(merge_data1$ended_at, merge_data1$started_at,
+                                     units = "mins"))
+######Some int are negative in ride_duration because some bikes did not finish their trips because of mechanical issues.####
+###drop rows where ride_duration < 0 ###
+###because data is being deleted, create a new data frame####
+
+merge_data1$ride_duration[merge_data1$ride_duration < 0] <- NA
+
+
+sum(is.na(merge_data1$ride_duration))
+
+##NA = 131##
+###drop na rows and create new data frame###
+
+
+trips <- data_frame(merge_data1)
+
+trips<- trips %>%
+  na.omit(trips)
