@@ -1,4 +1,4 @@
-###Libraries I used###
+				###Libraries I used###
 
 library(tidyverse)
 library(readr)
@@ -167,3 +167,4 @@ trips <- data_frame(merge_data1)
 
 trips<- trips %>%
   na.omit(trips)
+
